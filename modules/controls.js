@@ -1,6 +1,6 @@
 import { heroRigidBody } from "./hero.js";
-import { Vector2 } from "./classes/Vector2.js";
-import { isKeyDown } from "./input-system.js";
+import { Vector2 } from "../classes/Vector2.js";
+import { isKeyDown } from "../utils/input-system.js";
 
 // Dependencies
 export default {

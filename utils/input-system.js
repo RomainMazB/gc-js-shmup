@@ -19,6 +19,9 @@ document.addEventListener("keyup", e => {
     downKeys.splice(downKeysIndex, 1)
 })
 
+// Clean up all stored downKeys when the windows lose the focus
+window.addEventListener("blur", e => downKeys = [])
+
 // Return whether the keyCode is down or not
 export const isKeyDown = searchedCode => downKeys.findIndex(keyCode => keyCode === searchedCode) !== -1
 

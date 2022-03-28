@@ -1,6 +1,6 @@
-import {Transform} from "./classes/Transform.js";
-import RectangleBoxCollider from "./classes/RectangleBoxCollider.js";
-import {ALL} from "./constants.js";
+import {Transform} from "../classes/Transform.js";
+import RectangleBoxCollider from "../classes/RectangleBoxCollider.js";
+import {ALL, HERO} from "../utils/constants.js";
 
 const camera = {
     maxX: 0,
@@ -12,11 +12,12 @@ const camera = {
 }
 
 export const cameraTransform = new Transform(0, 0)
-export const cameraCollider = new RectangleBoxCollider(cameraTransform, ALL, 800, 600)
+export const cameraCollider = new RectangleBoxCollider(cameraTransform, 800, 600)
+cameraCollider.layer = ALL
 
 export default {
     tileToScreen (x, y) {
-        return { x: x * camera.tileWidth - cameraTransform.x, y: y * camera.tileHeight - cameraTransform.y }
+        return { x: x * camera.tileWidth, y: y * camera.tileHeight }
     },
 
     worldToScreen (x, y) {
@@ -31,8 +32,8 @@ export default {
         camera.width = pWidth
         camera.height = pHeight
         cameraCollider.width = pWidth
-        cameraCollider.height = pHeight
-        // console.log(cameraCollider)
+        cameraCollider.height = pHeight - 128
+        cameraCollider._offsetY = 32
 
         if (camera.maxX === 0 && camera.maxY === 0) {
             camera.maxX = pWidth
@@ -64,8 +65,17 @@ export default {
     },
 
     // Set the max x and y position of the bottom-right corner of the camera view
-    setLimits (maxX, maxY) {
+    setLimits(maxX, maxY) {
         camera.maxX = maxX
         camera.maxY = maxY
+    },
+
+    translate(pCtx) {
+        pCtx.save()
+        pCtx.translate(-cameraTransform.x, -cameraTransform.y)
+    },
+
+    reset(pCtx) {
+        pCtx.restore()
     }
 }

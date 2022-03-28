@@ -1,33 +1,36 @@
-import {ALL, DEFAULT} from "../constants.js";
+import {ALL, DEFAULT} from "../utils/constants.js";
+import physics from "../utils/physics.js";
 
 export default class Collider {
     _transform
-    isTrigger
-    layer
+    isTrigger = false
+    layer = DEFAULT
 
-    constructor(pTransform, pLayer = DEFAULT, pIsTrigger = false) {
+    constructor(pTransform, offsetX = 0, offsetY = 0) {
         this._transform = pTransform
-        this.isTrigger = pIsTrigger
-        this.layer = pLayer
+        this._offsetX = offsetX
+        this._offsetY = offsetY
+        physics.add(this)
     }
 
     collidesWith(otherCollider) {
-        return this.isOnTheSameLayer(otherCollider) && this._transform.x === otherCollider.x && this._transform.y === otherCollider.y
+        return this.isOnTheSameLayer(otherCollider) && this.x === otherCollider.x && this.y === otherCollider.y
     }
 
     resolveCollisionWith(otherCollider) {
-        throw new Error('You have to implement the method resolveCollisionWith!');
+        throw new Error('You have to implement the method resolveCollisionWith!')
     }
 
     isOnTheSameLayer(otherCollider) {
         return this.layer === ALL || otherCollider.layer === ALL || otherCollider.layer === this.layer
     }
 
-    get x() {
-        return this._transform.drawnX
-    }
+    get x () { return this._transform.x + this._offsetX }
+    get y () { return this._transform.y + this._offsetY }
+    get rightXBorder () { return this.x }
+    get bottomYBorder () { return this.y }
 
-    get y() {
-        return this._transform.drawnY
+    draw(pCtx) {
+        pCtx.fillRect(this.x, this.y, 1, 1)
     }
 }

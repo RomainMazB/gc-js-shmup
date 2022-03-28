@@ -1,12 +1,20 @@
 export class Transform {
-    constructor(pX, pY, pOffsetX = 0, pOffsetY = 0, pRotation = 0, pScaleX = 1, pScaleY = 1) {
+    x
+    y
+    isFlipped
+    constructor(pX, pY, pRotation = 0, pScaleX = 1, pScaleY = 1, pIsFlipped = false) {
         this.x = pX
         this.y = pY
         this.rotation = pRotation
         this.scaleX = pScaleX
         this.scaleY = pScaleY
+        this.isFlipped = pIsFlipped
     }
 
-    get drawnX () { return this.x - this.offsetX }
-    get drawnY () { return this.y - this.offsetY }
+    draw(pCtx) {
+        pCtx.strokeStyle = 'pink'
+        pCtx.beginPath()
+        pCtx.arc(this.x, this.y, 4, 0, 2 * Math.PI)
+        pCtx.stroke()
+    }
 }

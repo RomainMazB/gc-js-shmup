@@ -1,5 +1,5 @@
 import { Vector2 } from "./Vector2.js";
-import updater from "../updater.js";
+import updater from "../utils/updater.js";
 
 export default class RigidBody {
     #transform

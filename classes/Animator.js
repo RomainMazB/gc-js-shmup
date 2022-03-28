@@ -1,51 +1,77 @@
 import Sprite from "./Sprite.js";
 import AnimatedSprite from "./AnimatedSprite.js";
-import updater from "../updater.js";
+import updater from "../utils/updater.js";
+import {DEFAULT} from "../utils/constants.js";
 
 export default class Animator {
-    #id
-    get id() { return this.#id }
+    #transform
     #src
     #width
     #height
-    #states = {}
+    #offsetX
+    #offsetY
+    #states = []
     #activeState
 
-    constructor(pId, pSrc, pWidth, pHeight) {
-        this.#id = pId
+    constructor(pTransform, pSrc, pWidth, pHeight, pOffsetX = 0, pOffsetY = 0) {
+        this.#transform = pTransform
         this.#src = pSrc
         this.#width = pWidth
         this.#height = pHeight
+        this.#offsetX = pOffsetX
+        this.#offsetY = pOffsetY
         updater.add(this)
     }
 
-    addStaticState(pStateName, pX, pY) {
-        this.registerState(pStateName, new Sprite(this.#src, pX, pY, this.#width, this.#height))
+    addStaticState(pStateName, pConditionCallback, pX, pY) {
+        this.registerState(pStateName, pConditionCallback, new Sprite(this.#transform, this.#src, pX, pY, this.#width, this.#height, this.#offsetX, this.#offsetY))
     }
 
-    addAnimatedState(pStateName, pX, pY, pNbFrames, pSpeed, pMargin, pIsHorizontal = true) {
-        this.registerState(pStateName, new AnimatedSprite(this.#src, pX, pY, pNbFrames, this.#width, this.#height, pSpeed, pMargin, pIsHorizontal = true))
+    addAnimatedState(pStateName, pConditionCallback, pX, pY, pNbFrames, pSpeed, pMargin, pIsHorizontal = true) {
+        this.registerState(pStateName, pConditionCallback, new AnimatedSprite(this.#transform, this.#src, pX, pY, pNbFrames, this.#width, this.#height, pSpeed, pMargin, pIsHorizontal = true, this.#offsetX, this.#offsetY))
     }
 
     setActiveState(pStateName) {
-        if (this.#states[pStateName] === undefined) throw Error(`The state ${pStateName} is not registered.`)
+        let stateIndex = this.#states.findIndex(state => state.conditionCallback())
 
-        this.#activeState = pStateName
+        if (stateIndex === -1) throw Error(`The state ${pStateName} is not registered.`)
+
+        this.#activeState = stateIndex
     }
 
-    registerState(pStateName, pSprite) {
-        this.#states[pStateName] = pSprite
+    /**
+     * Add a possible state to the Animator
+     * @param pStateName
+     * @param pConditionCallback
+     * @param pSprite
+     */
+    registerState(pStateName, pConditionCallback, pSprite) {
+        if (pConditionCallback === DEFAULT) pConditionCallback = _ => true
 
-        if (this.#activeState === undefined) this.#activeState = pStateName
+        this.#states.unshift({
+            name: pStateName,
+            conditionCallback: pConditionCallback,
+            sprite: pSprite
+        })
+
+        /** If it's the first registered state of the Animator
+         * Add it as the activeState and set it as default
+         */
+        if (this.#activeState === undefined) this.#activeState = 0
     }
 
     update(pDt) {
         if (this.#activeState === undefined) return
 
-        if (this.#states[this.#activeState] instanceof AnimatedSprite) this.#states[this.#activeState].tick(pDt)
+        let stateIndex = this.#states.findIndex(state => state.conditionCallback())
+
+        if (stateIndex === -1) stateIndex = 0
+        this.#activeState = stateIndex
+
+        if (this.#states[this.#activeState].sprite instanceof AnimatedSprite) this.#states[this.#activeState].sprite.tick(pDt)
     }
 
-    draw(pCtx, pX, pY, pWidth, pHeight) {
-        this.#states[this.#activeState].draw(pCtx, pX, pY, pWidth, pHeight)
+    draw(pCtx, debug = false) {
+        this.#states[this.#activeState].sprite.draw(pCtx, debug)
     }
 }

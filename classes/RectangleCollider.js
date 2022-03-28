@@ -1,12 +1,11 @@
-import {DEFAULT} from "../constants.js";
 import Collider from "./Collider.js";
 
 export default class RectangleCollider extends Collider {
     width
     height
 
-    constructor(pTransform, pLayer = DEFAULT, pWidth, pHeight, pIsTrigger = false) {
-        super(pTransform, pLayer, pIsTrigger);
+    constructor(pTransform, pWidth, pHeight, offsetX = 0, offsetY = 0) {
+        super(pTransform, offsetX, offsetY);
         this.width = pWidth
         this.height = pHeight
     }
@@ -18,15 +17,15 @@ export default class RectangleCollider extends Collider {
      */
     collidesWith(otherCollider) {
         return this.isOnTheSameLayer(otherCollider) && (
-                   otherCollider.pointIsInside(this._transform.x, this._transform.y) ||
-                   otherCollider.pointIsInside(this._transform.x + this.width, this._transform.y) ||
-                   otherCollider.pointIsInside(this._transform.x, this._transform.y + this.height) ||
-                   otherCollider.pointIsInside(this._transform.x + this.width, this._transform.y + this.height)
+                   otherCollider.pointIsInside(this.x, this.y) ||
+                   otherCollider.pointIsInside(this.rightXBorder, this.y) ||
+                   otherCollider.pointIsInside(this.x, this.bottomYBorder) ||
+                   otherCollider.pointIsInside(this.rightXBorder, this.bottomYBorder)
         )
     }
 
     resolveCollisionWith(otherCollider) {
-
+        console.log("ok")
     }
 
     /**
@@ -40,5 +39,13 @@ export default class RectangleCollider extends Collider {
                x <= this._transform.x + this.width &&
                y >= this._transform.y &&
                y <= this._transform.y + this.height
+    }
+
+    get rightXBorder () { return this.x + this.width }
+    get bottomYBorder () { return this.y + this.height }
+
+    draw(pCtx) {
+        pCtx.strokeStyle = 'yellow'
+        pCtx.strokeRect(this.x, this.y, this.width, this.height)
     }
 }

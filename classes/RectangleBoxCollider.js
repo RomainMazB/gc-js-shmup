@@ -5,8 +5,13 @@ export default class RectangleBoxCollider extends RectangleCollider {
         if (! this.isOnTheSameLayer(otherCollider)) return false
 
         return otherCollider.x < this.x ||
-               otherCollider.x + otherCollider.width > this.x + this.width ||
+               otherCollider.rightXBorder >= this.rightXBorder ||
                otherCollider.y < this.y ||
-               otherCollider.y + otherCollider.height > this.y + this.height
+               otherCollider.bottomYBorder >= this.bottomYBorder
+    }
+
+    resolveCollisionWith(otherCollider) {
+        otherCollider._transform.x = clamp(otherCollider._transform.x, this.x - otherCollider._offsetX, this.rightXBorder + otherCollider._offsetX)
+        otherCollider._transform.y = clamp(otherCollider._transform.y, this.y - otherCollider._offsetY, this.bottomYBorder + otherCollider._offsetY)
     }
 }

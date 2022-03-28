@@ -1,9 +1,9 @@
-import TilesetLoader from "./utils/tileset-loader.js";
+import TilesetLoader from "../utils/tileset-loader.js";
 import camera from "./camera.js"
 import UI from "./ui.js"
 
 const level = {}
-const levelBasePath = './assets/levels/'
+const levelBasePath = '../../assets/levels/'
 
 const XYToTiled = (x, y) => y * level.data.width + x
 const tiledToXY = (n) => ({ x: n / level.data })

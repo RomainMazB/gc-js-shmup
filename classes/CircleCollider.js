@@ -1,21 +1,33 @@
-import { Vector2 } from "./Vector2.js";
 import Collider from "./Collider.js";
-import {DEFAULT} from "../constants.js";
 
+/**
+ * Circle collider class
+ * offsetX and offsetY are automatically set with the circle size to center it
+ */
 export default class CircleCollider extends Collider {
     size
 
-    constructor(pTransform, pLayer = DEFAULT, pSize, pIsTrigger = false) {
-        super(pTransform, pLayer, pIsTrigger);
+    constructor(pTransform, pSize, offsetX, offsetY) {
+        offsetX = offsetX !== undefined ? offsetX : -pSize
+        offsetY = offsetY !== undefined ? offsetX : -pSize
+        super(pTransform, offsetX, offsetY);
         this.size = pSize
     }
 
     collidesWith(otherCollider) {
-        return this._transform.x === otherCollider.x && this._transform.y === otherCollider.y
+        if (! this.isOnTheSameLayer(otherCollider)) return false
+
+        if (otherCollider instanceof CircleCollider)
+            return this.size + otherCollider.size <= Math.abs(this.x - otherCollider.x) + Math.abs(this.y - otherCollider.y)
+
+        return this.pointIsInside(otherCollider.x, this.y) ||
+               this.pointIsInside(otherCollider.x + otherCollider.width, this.y) ||
+               this.pointIsInside(this.x, otherCollider.y) ||
+               this.pointIsInside(this.x, otherCollider.y + otherCollider.height)
     }
 
     resolveCollisionWith(otherCollider) {
-
+        console.log("boup")
     }
 
     /**
@@ -25,22 +37,18 @@ export default class CircleCollider extends Collider {
      * @returns {boolean}
      */
     pointIsInside(x, y) {
-        return Math.sqrt((x - this.x)^2 + (y - this.x)^2) <= this.size
+        return Math.abs(Math.hypot(x - this.x, y - this.x)) <= this.size
     }
 
-    get width() {
-        return this.size * 2
-    }
+    get width() { return this.size * 2 }
+    get height() { return this.size * 2 }
+    get rightXBorder () { return this.x - this._offsetX + this.size }
+    get bottomYBorder () { return this.y - this._offsetY + this.size }
 
-    get height() {
-        return this.size * 2
-    }
-
-    get x() {
-        return this._transform.x
-    }
-
-    get y() {
-        return this._transform.y
+    draw(pCtx) {
+        pCtx.strokeStyle = 'yellow'
+        pCtx.beginPath()
+        pCtx.arc(this.x - this._offsetX, this.y - this._offsetY, this.size, 0, 2 * Math.PI)
+        pCtx.stroke()
     }
 }
