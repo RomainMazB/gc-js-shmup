@@ -1,10 +1,12 @@
+import './utils/input-system.js'
+import './utils/math-utils.js'
 import level from './modules/level.js'
-import hero, {heroCollider, heroRigidBody} from './modules/hero.js'
-import camera, {cameraCollider} from './modules/camera.js'
+import hero, {heroRigidBody} from './modules/hero.js'
+import camera from './modules/camera.js'
 import controls from './modules/controls.js'
 import updater from './utils/updater.js'
-import './utils/input-system.js'
 import physics from "./utils/physics.js";
+window.debug = true
 
 let scroll = 0
 export default {
@@ -17,20 +19,19 @@ export default {
 
     update (dt) {
         level.update(dt)
-        controls.update(dt)
         hero.update(dt)
-        updater.update(dt)
         physics.update(dt)
+        controls.update(dt)
+        updater.update(dt)
         camera.setPosition(Math.round(scroll), 0)
-        scroll += 50 * dt
+        // scroll += 50 * dt
     },
 
     draw (pCtx) {
         camera.translate(pCtx)
         level.draw(pCtx)
         hero.draw(pCtx)
-        cameraCollider.draw(pCtx)
-        heroCollider.draw(pCtx)
+        physics.draw(pCtx)
         camera.reset(pCtx)
     }
 }

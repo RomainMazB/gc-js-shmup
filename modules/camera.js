@@ -1,6 +1,6 @@
 import {Transform} from "../classes/Transform.js";
 import RectangleBoxCollider from "../classes/RectangleBoxCollider.js";
-import {ALL, HERO} from "../utils/constants.js";
+import {CAMERA} from "../utils/constants.js";
 
 const camera = {
     maxX: 0,
@@ -12,8 +12,9 @@ const camera = {
 }
 
 export const cameraTransform = new Transform(0, 0)
-export const cameraCollider = new RectangleBoxCollider(cameraTransform, 800, 600)
-cameraCollider.layer = ALL
+export const cameraCollider = new RectangleBoxCollider(cameraTransform, 960, 640)
+cameraCollider.setLayer(CAMERA)
+cameraCollider.isStatic = true
 
 export default {
     tileToScreen (x, y) {
@@ -32,7 +33,7 @@ export default {
         camera.width = pWidth
         camera.height = pHeight
         cameraCollider.width = pWidth
-        cameraCollider.height = pHeight - 128
+        cameraCollider.height = pHeight - 64
         cameraCollider._offsetY = 32
 
         if (camera.maxX === 0 && camera.maxY === 0) {

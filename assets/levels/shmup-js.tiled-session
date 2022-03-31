@@ -9,7 +9,7 @@
     "fileStates": {
         "/media/maz/SSD/game-dev/shmup-js/assets/images/tilesheet.json": {
             "scaleInDock": 1,
-            "scaleInEditor": 4
+            "scaleInEditor": 1
         },
         "/media/maz/SSD/game-dev/shmup-js/assets/images/tilesheet.tsx": {
             "scaleInDock": 3,
@@ -19,8 +19,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 566.5,
-                "y": -70.5
+                "x": 1394.5,
+                "y": 153
             }
         },
         "tilesheet.json": {
@@ -28,6 +28,7 @@
             "scaleInEditor": 1
         }
     },
+    "last.exportedFilePath": "/media/maz/SSD/game-dev/shmup-js/assets/levels",
     "map.lastUsedExportFilter": "Fichiers de carte JavaScript (*.js)",
     "map.lastUsedFormat": "tmx",
     "map.renderOrder": null,
@@ -39,9 +40,10 @@
         "/media/maz/SSD/game-dev/shmup-js/assets/images/tilesheet.json"
     ],
     "project": "",
+    "property.type": "bool",
     "recentFiles": [
-        "level1.tmx",
         "/media/maz/SSD/game-dev/shmup-js/assets/images/tilesheet.json",
+        "level1.tmx",
         "tilesheet.json",
         "/media/maz/SSD/game-dev/shmup-js/assets/images/tilesheet.tsx"
     ],

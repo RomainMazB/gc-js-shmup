@@ -1,3 +1,47 @@
-#canvas {
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh
+}
+
+#stage {
+    width: 960px;
+    height: 640px;
+    position: relative;
+    overflow: hidden;
+}
+
+img#scrolling-background {
+    position: absolute;
+    inset: 0;
     background-color: darkslategray;
+}
+
+div#menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 64px;
+}
+
+div#menu button {
+    appearance: none;
+    border: none;
+    width: 64px;
+    height: 64px;
+    background-image: url("./assets/images/tilesheet.png");
+    background-position-x: calc(38 * -64px);
+    background-position-y: calc(12 * -64px);
+    background-color: transparent;
+}
+
+div#menu button:hover {
+    background-position-x: calc(38 * -64px);
+    background-position-y: calc(12 * -64px);
+}
+
+canvas {
+    position: absolute;
 }

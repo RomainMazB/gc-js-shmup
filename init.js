@@ -1,7 +1,7 @@
 import game from './main.js'
 
-let canvas = document.getElementById("canvas")
-let ctx = canvas.getContext("2d")
+let gameCanvas = document.getElementById("game-layer")
+let gameCtx = gameCanvas.getContext("2d")
 
 let lastUpdate = 0
 
@@ -11,14 +11,14 @@ function run(time) {
 
     lastUpdate = time
     game.update(dt)
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    game.draw(ctx)
+    gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height)
+    game.draw(gameCtx)
 }
 
 (async function () {
-    ctx.imageSmoothingEnabled = false
-    ctx.msImageSmoothingEnabled = false
-    ctx.webkitImageSmoothingEnabled = false
-    await game.load(canvas, ctx)
+    gameCtx.imageSmoothingEnabled = false
+    gameCtx.msImageSmoothingEnabled = false
+    gameCtx.webkitImageSmoothingEnabled = false
+    await game.load(gameCanvas, gameCtx)
     requestAnimationFrame(run)
 })()

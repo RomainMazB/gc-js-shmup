@@ -71,7 +71,7 @@ export default class Animator {
         if (this.#states[this.#activeState].sprite instanceof AnimatedSprite) this.#states[this.#activeState].sprite.tick(pDt)
     }
 
-    draw(pCtx, debug = false) {
-        this.#states[this.#activeState].sprite.draw(pCtx, debug)
+    draw(pCtx) {
+        this.#states[this.#activeState].sprite.draw(pCtx)
     }
 }

@@ -2,8 +2,6 @@ import RectangleCollider from "./RectangleCollider.js";
 
 export default class RectangleBoxCollider extends RectangleCollider {
     collidesWith(otherCollider) {
-        if (! this.isOnTheSameLayer(otherCollider)) return false
-
         return otherCollider.x < this.x ||
                otherCollider.rightXBorder >= this.rightXBorder ||
                otherCollider.y < this.y ||

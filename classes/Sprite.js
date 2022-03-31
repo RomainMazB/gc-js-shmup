@@ -17,16 +17,16 @@ export default class Sprite {
     get drawnHeight () { return this._height * this._transform.scaleY }
     get scaleX () { return this._transform.isFlipped ? -1 : 1 }
 
-    draw(pCtx, debug = false) {
+    draw(pCtx) {
         pCtx.save()
         pCtx.translate(this.drawnX, this.drawnY);
         pCtx.scale(this.scaleX, 1);
         pCtx.drawImage(this._img, this._x, this._y, this._width, this._height, 0, 0, this.drawnWidth, this.drawnHeight)
 
-        if (debug) {
-            pCtx.strokeStyle = 'red'
-            pCtx.strokeRect(0, 0, this.drawnWidth, this.drawnHeight)
-        }
+        // if (debug) {
+        //     pCtx.strokeStyle = 'red'
+        //     pCtx.strokeRect(0, 0, this.drawnWidth, this.drawnHeight)
+        // }
 
         pCtx.restore()
     }

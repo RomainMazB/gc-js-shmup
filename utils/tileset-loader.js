@@ -17,8 +17,9 @@ export default function (tilesetName, firstgid) {
         for (let i = 0; i < tilesetData.tilecount; i++) {
             let x = (i + tilesetData.columns) % tilesetData.columns
             let y = Math.floor(i / tilesetData.columns)
+            let tileId = firstgid + i
 
-            tiles[firstgid + i] = {
+            let newTile = {
                 image: tilesetImage,
                 coords: {
                     x: x * tilesetData.tilewidth,
@@ -27,6 +28,17 @@ export default function (tilesetName, firstgid) {
                     height: tilesetData.tileheight
                 }
             }
+
+            // Read any eventual tile properties
+            let tileProperties = tilesetData.tiles.find(tile => tile.id === i)
+            if (tileProperties !== undefined) {
+                newTile.properties = {}
+                tileProperties.properties.forEach(function (property) {
+                    newTile.properties[property.name] = property.value
+                })
+            }
+
+            tiles[tileId] = newTile
         }
 
         resolve(tiles)

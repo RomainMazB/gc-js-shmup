@@ -44,7 +44,7 @@ export default class AnimatedSprite extends Sprite {
     pause () { this.#playing = false }
     play () { this.#playing = true }
 
-    draw(pCtx, debug = false) {
+    draw(pCtx) {
         pCtx.save()
         pCtx.translate(this.drawnX, this.drawnY);
         pCtx.scale(this.scaleX, 1);

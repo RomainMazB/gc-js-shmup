@@ -5,10 +5,10 @@ import CircleCollider from "../classes/CircleCollider.js";
 import Animator from "../classes/Animator.js";
 import {DEAD, DEFAULT, HERO, IDLE, JUMP, LEFT, RIGHT, RUN} from "../utils/constants.js";
 
-export const heroTransform = new Transform(32, 26)
+export const heroTransform = new Transform(32, 200)
 export const heroRigidBody = new RigidBody(heroTransform)
 export const heroCollider = new CircleCollider(heroTransform, 15)
-heroCollider.layer = HERO
+heroCollider.setLayer(HERO)
 export const hero = {
     isJumping: false,
     lastDirection: RIGHT,
@@ -30,6 +30,11 @@ export default {
         })
     },
 
+    flipHero() {
+        heroTransform.isFlipped = !heroTransform.isFlipped
+        hero.lastDirection = heroTransform.isFlipped ? LEFT : RIGHT
+    },
+
     update(pDt) {
         if (hero.lastDirection === RIGHT && heroRigidBody.velocity.x < 0 ||
             hero.lastDirection === LEFT && heroRigidBody.velocity.x > 0
@@ -37,12 +42,7 @@ export default {
     },
 
     draw (pCtx) {
-        heroAnimator.draw(pCtx, true)
+        heroAnimator.draw(pCtx)
         heroTransform.draw(pCtx)
-    },
-
-    flipHero() {
-        heroTransform.isFlipped = !heroTransform.isFlipped
-        hero.lastDirection = heroTransform.isFlipped ? LEFT : RIGHT
     }
 }

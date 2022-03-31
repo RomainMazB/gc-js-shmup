@@ -1,29 +1,24 @@
-import {ALL, DEFAULT} from "../utils/constants.js";
+import {DEFAULT} from "../utils/constants.js";
 import physics from "../utils/physics.js";
 
 export default class Collider {
     _transform
     isTrigger = false
+    isStatic = false
     layer = DEFAULT
 
-    constructor(pTransform, offsetX = 0, offsetY = 0) {
+    constructor(pTransform, pOffsetX = 0, pOffsetY = 0) {
         this._transform = pTransform
-        this._offsetX = offsetX
-        this._offsetY = offsetY
+        this._offsetX = pOffsetX
+        this._offsetY = pOffsetY
         physics.add(this)
     }
 
     collidesWith(otherCollider) {
-        return this.isOnTheSameLayer(otherCollider) && this.x === otherCollider.x && this.y === otherCollider.y
+        return this.x === otherCollider.x && this.y === otherCollider.y
     }
 
-    resolveCollisionWith(otherCollider) {
-        throw new Error('You have to implement the method resolveCollisionWith!')
-    }
-
-    isOnTheSameLayer(otherCollider) {
-        return this.layer === ALL || otherCollider.layer === ALL || otherCollider.layer === this.layer
-    }
+    resolveCollisionWith(otherCollider) {}
 
     get x () { return this._transform.x + this._offsetX }
     get y () { return this._transform.y + this._offsetY }
@@ -32,5 +27,10 @@ export default class Collider {
 
     draw(pCtx) {
         pCtx.fillRect(this.x, this.y, 1, 1)
+    }
+
+    setLayer(pLayer) {
+        this.layer = pLayer
+        physics.refreshCollisionCache(this)
     }
 }

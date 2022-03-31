@@ -15,40 +15,56 @@ export default class CircleCollider extends Collider {
     }
 
     collidesWith(otherCollider) {
-        if (! this.isOnTheSameLayer(otherCollider)) return false
-
         if (otherCollider instanceof CircleCollider)
-            return this.size + otherCollider.size <= Math.abs(this.x - otherCollider.x) + Math.abs(this.y - otherCollider.y)
+            return Math.abs(
+                Math.hypot(otherCollider.center.x - this.center.x, otherCollider.center.y - this.center.y)
+            ) >= this.size + otherCollider.size
 
-        return this.pointIsInside(otherCollider.x, this.y) ||
-               this.pointIsInside(otherCollider.x + otherCollider.width, this.y) ||
-               this.pointIsInside(this.x, otherCollider.y) ||
-               this.pointIsInside(this.x, otherCollider.y + otherCollider.height)
+        // Test for AABB collision first to eliminate most of the cases
+        if (!aabb(otherCollider, this)) return false
+
+        // Test for a corner inside the circle
+        if (circleContainsPoint(this, point(otherCollider.x, otherCollider.y)) ||
+               circleContainsPoint(this, point(otherCollider.rightXBorder, otherCollider.y)) ||
+               circleContainsPoint(this, point(otherCollider.x, otherCollider.bottomYBorder)) ||
+               circleContainsPoint(this, point(otherCollider.rightXBorder, otherCollider.bottomYBorder))) return true
+
+        let center = this.center
+        // Test for the circle center inside the other collider
+        if (rectContainsPoint(otherCollider, center)) return true
+
+        // Test for line (not corner) intersection inside the circle
+        let verticalProj = segmentProjection(
+            point(otherCollider.x, otherCollider.y),
+            point(this.x, this.y),
+            point(this.x, this.bottomYBorder)
+        );
+
+        let horizontalProj = segmentProjection(
+            point(otherCollider.x, otherCollider.y),
+            point(this.x, this.y),
+            point(this.rightXBorder, this.y)
+        );
+
+        if (verticalProj || horizontalProj) console.log('projections')
+        return verticalProj || horizontalProj
     }
 
     resolveCollisionWith(otherCollider) {
-        console.log("boup")
-    }
-
-    /**
-     * Return whether a point is inside the circle or not
-     * @param x
-     * @param y
-     * @returns {boolean}
-     */
-    pointIsInside(x, y) {
-        return Math.abs(Math.hypot(x - this.x, y - this.x)) <= this.size
+        console.log(otherCollider.layer)
     }
 
     get width() { return this.size * 2 }
     get height() { return this.size * 2 }
-    get rightXBorder () { return this.x - this._offsetX + this.size }
-    get bottomYBorder () { return this.y - this._offsetY + this.size }
+    get rightXBorder () { return this.x + this.width-1 }
+    get bottomYBorder () { return this.y + this.height-1 }
+    get center () { return point(this.x + this.size, this.y + this.size) }
 
     draw(pCtx) {
         pCtx.strokeStyle = 'yellow'
         pCtx.beginPath()
-        pCtx.arc(this.x - this._offsetX, this.y - this._offsetY, this.size, 0, 2 * Math.PI)
+        let center = this.center
+        pCtx.arc(center.x, center.y, this.size, 0, 2 * Math.PI)
         pCtx.stroke()
     }
 }
