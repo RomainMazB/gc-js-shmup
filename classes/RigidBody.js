@@ -1,9 +1,9 @@
-import { Vector2 } from "./Vector2.js";
+import { Vec2 } from "./Vec2.js";
 import updater from "../utils/updater.js";
 
 export default class RigidBody {
     #transform
-    velocity = new Vector2(0, 0)
+    velocity = new Vec2(0, 0)
 
     constructor(pTransform) {
         this.#transform = pTransform

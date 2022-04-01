@@ -1,5 +1,5 @@
 import {ALL, CAMERA, ENEMY, ENEMY_PROJECTILES, HERO, HERO_PROJECTILES, MAP} from "./constants.js";
-import {Vector2} from "../classes/Vector2.js";
+import {Vec2} from "../classes/Vec2.js";
 
 let collidingLayers = {
     [HERO]: [CAMERA, MAP, ENEMY_PROJECTILES],
@@ -48,12 +48,12 @@ const processingCollisions = []
 
 const collisionIsRegistered = (colliderA, colliderB) => collidersCollisionsCache[cacheStringFor(colliderA, colliderB)] !== undefined
 
-const findCollider = colliderId => colliders.find(collider => collider.colliderId === colliderId)
+const findCollider = colliderId => colliders[Object.keys(colliders).find(cId => cId === colliderId)]
 
 export default {
     update(pDt) {
         let frameCollisions = []
-        let collidersResolved = {}
+        let collisionResolutions = {}
         let a = []
         // Loop through all the colliders
         for (let i = 0; i < colliders.length; i++) {
@@ -73,28 +73,41 @@ export default {
                     }
                     else if (collider.isStatic && !otherCollider.isStatic) {
                         console.log("add: "+ otherCollider.colliderId)
-                        if (collidersResolved[otherCollider.colliderId] === undefined)
-                            collidersResolved[otherCollider.colliderId] = collider.resolveCollisionWith(otherCollider)
+                        if (collisionResolutions[otherCollider.colliderId] === undefined)
+                            collisionResolutions[otherCollider.colliderId] = [collider.getCollisionResolutionFor(otherCollider)]
                         else
-                            collidersResolved[otherCollider.colliderId].add(collider.resolveCollisionWith(otherCollider))
+                            collisionResolutions[otherCollider.colliderId].push(collider.getCollisionResolutionFor(otherCollider))
                     }
                     else if (otherCollider.isStatic && !collider.isStatic) {
-                        console.log("add: "+ collider.colliderId)
-                        if (collidersResolved[collider.colliderId] === undefined)
-                            collidersResolved[collider.colliderId] = otherCollider.resolveCollisionWith(collider)
+                        if (collisionResolutions[collider.colliderId] === undefined)
+                            collisionResolutions[collider.colliderId] = [otherCollider.getCollisionResolutionFor(collider)]
                         else
-                            collidersResolved[collider.colliderId].add(otherCollider.resolveCollisionWith(collider))
+                            collisionResolutions[collider.colliderId].push(otherCollider.getCollisionResolutionFor(collider))
                     }
                 }
             })
         }
 
-        for(colliderId in collidersResolved) {
-            console.log(colliderId, collidersResolved)
+        for(colliderId of Object.keys(collisionResolutions)) {
             let collider = findCollider(colliderId)
-            console.log(collider)
-            // collider._transform.x = collidersResolved[colliderId].x
-            // collider._transform.y = collidersResolved[colliderId].y
+            if (collisionResolutions[colliderId].length === 1) {
+                collider._transform.x += collisionResolutions[colliderId][0].vec.x
+                collider._transform.y += collisionResolutions[colliderId][0].vec.y
+            } else {
+                let highestResolutionPriority =
+                    collisionResolutions[colliderId]
+                        .reduce((prev, cur) => {
+                            if (cur.priority > prev.priority) return cur
+                            else if (cur.priority < prev.priority) return prev
+                            else prev.vec.add(cur.vec)
+                        })
+
+                let mergedResolutionX = highestResolutionPriority.vec.x < 0 ? Math.ceil(highestResolutionPriority.vec.x) : Math.floor(highestResolutionPriority.vec.x)
+                let mergedResolutionY = highestResolutionPriority.vec.y < 0 ? Math.ceil(highestResolutionPriority.vec.y) : Math.floor(highestResolutionPriority.vec.y)
+
+                collider._transform.x += mergedResolutionX
+                collider._transform.y += mergedResolutionY
+            }
         }
 
         // Check if a trigger collision ended

@@ -18,7 +18,7 @@ export default class Collider {
         return this.x === otherCollider.x && this.y === otherCollider.y
     }
 
-    resolveCollisionWith(otherCollider) {}
+    getCollisionResolutionFor(otherCollider) {}
 
     get x () { return this._transform.x + this._offsetX }
     get y () { return this._transform.y + this._offsetY }

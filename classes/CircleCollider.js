@@ -50,7 +50,7 @@ export default class CircleCollider extends Collider {
         return verticalProj || horizontalProj
     }
 
-    resolveCollisionWith(otherCollider) {
+    getCollisionResolutionFor(otherCollider) {
         console.log(otherCollider.layer)
     }
 

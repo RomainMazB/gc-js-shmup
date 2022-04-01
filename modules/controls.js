@@ -1,5 +1,5 @@
 import { heroRigidBody } from "./hero.js";
-import { Vector2 } from "../classes/Vector2.js";
+import { Vec2 } from "../classes/Vec2.js";
 import { isKeyDown } from "../utils/input-system.js";
 
 // Dependencies
@@ -10,14 +10,14 @@ export default {
         const HERO_SPEED = 120
         let movementVectors = []
 
-        if (isKeyDown("KeyA")) movementVectors.push(Vector2.left())
-        if (isKeyDown("KeyD")) movementVectors.push(Vector2.right())
-        if (isKeyDown("KeyW")) movementVectors.push(Vector2.top())
-        if (isKeyDown("KeyS")) movementVectors.push(Vector2.bottom())
+        if (isKeyDown("KeyA")) movementVectors.push(Vec2.left())
+        if (isKeyDown("KeyD")) movementVectors.push(Vec2.right())
+        if (isKeyDown("KeyW")) movementVectors.push(Vec2.top())
+        if (isKeyDown("KeyS")) movementVectors.push(Vec2.bottom())
 
         heroRigidBody.velocity = movementVectors.reduce(
-            (prev, cur) => prev.add(cur.multiply(HERO_SPEED)),
-            Vector2.zero()
+            (prev, cur) => prev.add(cur.scale(HERO_SPEED)),
+            Vec2.zero()
         )
     },
 

@@ -1,7 +1,8 @@
 import Collider from "./Collider.js";
 import CircleCollider from "./CircleCollider.js";
 import {BOTTOM, LEFT, RIGHT, TOP} from "../utils/constants.js";
-import {Vector2} from "./Vector2.js";
+import {Vec2} from "./Vec2.js";
+import CollisionResolution from "./CollisionResolution.js";
 
 export default class RectangleCollider extends Collider {
     width
@@ -22,70 +23,36 @@ export default class RectangleCollider extends Collider {
         return (otherCollider instanceof CircleCollider) ? otherCollider.collidesWith(this) : aabb(this, otherCollider)
     }
 
-    resolveCollisionWith(otherCollider) {
-        let isCircle = otherCollider instanceof CircleCollider
+    getCollisionResolutionFor(otherCollider) {
+        let collisionSide = this.collisionSideWith(otherCollider)
 
-        switch (this.collisionSideWith(otherCollider)) {
+        switch (collisionSide) {
             case TOP:
-                otherCollider._transform.y = this.y + otherCollider._offsetY - 1
-                break;
+                return new CollisionResolution(new Vec2(0, - (otherCollider.bottomYBorder - this.y) - 1), 1)
             case BOTTOM:
-                otherCollider._transform.y = this.bottomYBorder - otherCollider._offsetY + 1
-                break;
+                return new CollisionResolution(new Vec2(0, (this.bottomYBorder - otherCollider.y) + 1), 1)
             case LEFT:
-                otherCollider._transform.x = this.x + otherCollider._offsetX - 1
-                break;
+                return new CollisionResolution(new Vec2(- (otherCollider.rightXBorder - this.x) - 1, 0), 1)
             case RIGHT:
-                otherCollider._transform.x = this.rightXBorder - otherCollider._offsetX + 1
-                break;
+                return new CollisionResolution(new Vec2((this.rightXBorder - otherCollider.x) + 1, 0), 1)
             case TOP + LEFT:
-                if (isCircle) {
-                    let distanceBetweenAngleAndCircleCenter = new Vector2(this.x - otherCollider.center.x, this.y - otherCollider.center.y)
-                    let hypot = Math.hypot(distanceBetweenAngleAndCircleCenter.x, distanceBetweenAngleAndCircleCenter.y)
-                    let newDistance = distanceBetweenAngleAndCircleCenter.multiply((otherCollider.size + 1) / hypot)
-                    otherCollider._transform.x = this.x - newDistance.x
-                    otherCollider._transform.y = this.y - newDistance.y
-                } else {
-                    otherCollider._transform.x = this.x + otherCollider._offsetX - 1
-                    otherCollider._transform.y = this.y + otherCollider._offsetY - 1
-                }
-                break;
             case TOP + RIGHT:
-                if (isCircle) {
-                    let distanceBetweenAngleAndCircleCenter = new Vector2(this.rightXBorder - otherCollider.center.x, this.y - otherCollider.center.y)
-                    let hypot = Math.hypot(distanceBetweenAngleAndCircleCenter.x, distanceBetweenAngleAndCircleCenter.y)
-                    let newDistance = distanceBetweenAngleAndCircleCenter.multiply((otherCollider.size + 1) / hypot)
-                    otherCollider._transform.x = this.rightXBorder - newDistance.x
-                    otherCollider._transform.y = this.y - newDistance.y
-                } else {
-                    otherCollider._transform.x = this.rightXBorder - otherCollider._offsetX + 1
-                    otherCollider._transform.y = this.y + otherCollider._offsetY - 1
-                }
-                break;
             case BOTTOM + LEFT:
-                if (isCircle) {
-                    let distanceBetweenAngleAndCircleCenter = new Vector2(this.x - otherCollider.center.x, this.bottomYBorder - otherCollider.center.y)
-                    let hypot = Math.hypot(distanceBetweenAngleAndCircleCenter.x, distanceBetweenAngleAndCircleCenter.y)
-                    let newDistance = distanceBetweenAngleAndCircleCenter.multiply((otherCollider.size + 1) / hypot)
-                    otherCollider._transform.x = this.x - newDistance.x
-                    otherCollider._transform.y = this.bottomYBorder - newDistance.y
-                } else {
-                    otherCollider._transform.x = this.x + otherCollider._offsetX - 1
-                    otherCollider._transform.y = this.bottomYBorder - otherCollider._offsetY + 1
-                }
-                break;
             case BOTTOM + RIGHT:
-                if (isCircle) {
-                    let distanceBetweenAngleAndCircleCenter = new Vector2(this.rightXBorder - otherCollider.center.x, this.bottomYBorder - otherCollider.center.y)
-                    let hypot = Math.hypot(distanceBetweenAngleAndCircleCenter.x, distanceBetweenAngleAndCircleCenter.y)
-                    let newDistance = distanceBetweenAngleAndCircleCenter.multiply((otherCollider.size + 1) / hypot)
-                    otherCollider._transform.x = this.rightXBorder - newDistance.x
-                    otherCollider._transform.y = this.bottomYBorder - newDistance.y
-                } else {
-                    otherCollider._transform.x = this.rightXBorder - otherCollider._offsetX + 1
-                    otherCollider._transform.y = this.bottomYBorder - otherCollider._offsetY + 1
-                }
-                break;
+                let distanceBetweenAngleAndCircleCenter
+                if (collisionSide === TOP + LEFT)
+                    distanceBetweenAngleAndCircleCenter = new Vec2(otherCollider.center.x - this.x, otherCollider.center.y - this.y)
+                else if (collisionSide === TOP + RIGHT)
+                    distanceBetweenAngleAndCircleCenter = new Vec2(otherCollider.center.x - this.rightXBorder, otherCollider.center.y - this.y)
+                else if (collisionSide === BOTTOM + LEFT)
+                    distanceBetweenAngleAndCircleCenter = new Vec2(otherCollider.center.x - this.x, otherCollider.center.y - this.bottomYBorder)
+                else
+                    distanceBetweenAngleAndCircleCenter = new Vec2(otherCollider.center.x - this.rightXBorder, otherCollider.center.y - this.bottomYBorder)
+
+                let vecLength = distanceBetweenAngleAndCircleCenter.length()
+                let newDistance = distanceBetweenAngleAndCircleCenter.scale((otherCollider.size + 1) / vecLength)
+
+                return new CollisionResolution(newDistance.sub(distanceBetweenAngleAndCircleCenter), 0)
         }
     }
 
