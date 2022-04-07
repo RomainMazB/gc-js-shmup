@@ -1,4 +1,4 @@
-import Collider from "./Collider.js";
+import Collider from "./Collider.js"
 
 /**
  * Circle collider class
@@ -7,10 +7,10 @@ import Collider from "./Collider.js";
 export default class CircleCollider extends Collider {
     size
 
-    constructor(pTransform, pSize, offsetX, offsetY) {
+    constructor(pSize, offsetX, offsetY) {
         offsetX = offsetX !== undefined ? offsetX : -pSize
         offsetY = offsetY !== undefined ? offsetX : -pSize
-        super(pTransform, offsetX, offsetY);
+        super(offsetX, offsetY);
         this.size = pSize
     }
 
@@ -46,7 +46,6 @@ export default class CircleCollider extends Collider {
             point(this.rightXBorder, this.y)
         );
 
-        if (verticalProj || horizontalProj) console.log('projections')
         return verticalProj || horizontalProj
     }
 
@@ -61,6 +60,8 @@ export default class CircleCollider extends Collider {
     get center () { return point(this.x + this.size, this.y + this.size) }
 
     draw(pCtx) {
+        if (!debug) return
+
         pCtx.strokeStyle = 'yellow'
         pCtx.beginPath()
         let center = this.center

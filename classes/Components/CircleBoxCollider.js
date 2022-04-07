@@ -1,4 +1,4 @@
-import CircleCollider from "./CircleCollider.js";
+import CircleCollider from "./CircleCollider.js"
 
 export default class CircleBoxCollider extends CircleCollider {
     collidesWith(otherCollider) {

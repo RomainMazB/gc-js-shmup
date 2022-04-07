@@ -1,21 +1,20 @@
-import Collider from "./Collider.js";
-import CircleCollider from "./CircleCollider.js";
-import {BOTTOM, LEFT, RIGHT, TOP} from "../utils/constants.js";
-import {Vec2} from "./Vec2.js";
-import CollisionResolution from "./CollisionResolution.js";
+import Collider from "./Collider.js"
+import CircleCollider from "./CircleCollider.js"
+import {BOTTOM, LEFT, RIGHT, TOP} from "../../utils/constants.js"
+import {Vec2} from "../utils/Vec2.js"
+import CollisionResolution from "../CollisionResolution.js"
 
 export default class RectangleCollider extends Collider {
     width
     height
 
-    constructor(pTransform, pWidth, pHeight, offsetX = 0, offsetY = 0) {
-        super(pTransform, offsetX, offsetY);
+    constructor(pWidth, pHeight, offsetX = 0, offsetY = 0) {
+        super(offsetX, offsetY);
         this.width = pWidth
         this.height = pHeight
     }
 
     /**
-     * @in
      * @param otherCollider
      * @returns {boolean|*}
      */
@@ -61,8 +60,12 @@ export default class RectangleCollider extends Collider {
     get center () { return point(this.x + this.width / 2, this.y + this.height / 2) }
 
     draw(pCtx) {
-        pCtx.strokeStyle = 'yellow'
+        if (!debug) return
+
+        pCtx.strokeStyle = this.isActive ? 'red' : 'pink'
+        pCtx.setLineDash([6])
         pCtx.strokeRect(this.x, this.y, this.width, this.height)
+        pCtx.setLineDash([])
     }
 
     collisionSideWith(otherCollider) {

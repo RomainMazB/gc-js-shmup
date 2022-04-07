@@ -1,15 +1,25 @@
-import TilesetLoader from "../utils/tileset-loader.js";
+import TilesetLoader from "../utils/tileset-loader.js"
 import camera from "./camera.js"
-import {Transform} from "../classes/Transform.js";
-import RectangleCollider from "../classes/RectangleCollider.js";
-import Sprite from "../classes/Sprite.js";
-import {MAP} from "../utils/constants.js";
+import Transform from "../classes/Components/Transform.js"
+import RectangleCollider from "../classes/Components/RectangleCollider.js"
+import Sprite from "../classes/Components/Sprite.js"
+import {ENEMY, MAP} from "../utils/constants.js"
+import WaveManager from "../classes/WaveManager.js"
+import EnemiesWave from "../classes/EnemiesWave.js"
+import Enemy from "../classes/Enemy.js"
+import RigidBody from "../classes/Components/RigidBody.js"
 
-const level = {}
+export const level = {}
 const levelBasePath = '../../assets/levels/'
 
 const XYToTiled = (x, y) => y * level.data.width + x
 const tiledToXY = (n) => ({ x: (n % level.data.width) * level.data.tilewidth, y: Math.floor(n / level.data.width) * level.data.tileheight})
+
+// Return a tiled object property by its name
+function getObjectProperty(obj, prop) {
+    let property = obj.properties.find(p => p.name === prop)
+    return property === undefined ? undefined : property.value
+}
 
 let mapTiles = []
 
@@ -31,7 +41,7 @@ export default {
                     level.tilesFromTileSet = {...level.tilesFromTileSet, ...await TilesetLoader(tilesetName, tileset.firstgid)}
                 }
 
-                // Fill the different layers
+                // Fill the obstacles layer
                 for (let i = 0; i < level.data.layers[0].data.length; i++) {
                     let textureId = level.data.layers[0].data[i]
 
@@ -41,17 +51,46 @@ export default {
                     let tileCoords = tiledToXY(i)
                     let tileComponents = {}
                     tileComponents.transform = new Transform(tileCoords.x, tileCoords.y)
-                    tileComponents.sprite = new Sprite(tileComponents.transform, texture.image.src, texture.coords.x, texture.coords.y, texture.coords.width, texture.coords.height)
+                    tileComponents.sprite = new Sprite(texture.image, texture.coords.x, texture.coords.y, texture.coords.width, texture.coords.height)
 
                     if (texture.properties !== undefined) {
                         if (texture.properties.walkable === false) {
-                            tileComponents.collider = new RectangleCollider(tileComponents.transform, texture.coords.width, texture.coords.height)
+                            tileComponents.collider = new RectangleCollider(texture.coords.width, texture.coords.height)
                             tileComponents.collider.setLayer(MAP)
                             tileComponents.collider.isStatic = true
                         }
                     }
 
                     mapTiles.push(tileComponents)
+                }
+
+                // Search the ennemies layers group
+                let enemiesLayerGroup = level.data.layers.find(layer => layer.type === 'group' && layer.name === 'Ennemies')
+                if (enemiesLayerGroup !== undefined) {
+                    enemiesLayerGroup.layers.forEach(enemiesWaveLayer => {
+                        let delay = getObjectProperty(enemiesWaveLayer, 'delay'),
+                            x = getObjectProperty(enemiesWaveLayer, 'x'),
+                            appearingSpeed = getObjectProperty(enemiesWaveLayer, 'appearingSpeed')
+                        let enemiesWave = new EnemiesWave(delay, x, appearingSpeed)
+
+                        // Get the lowest x from the wave to align enemies with each others
+                        let initialValue = enemiesWaveLayer.objects[0].x
+                        let minX = enemiesWaveLayer.objects.reduce((prev, cur) => cur.x < prev ? cur.x : prev, initialValue)
+                        enemiesWaveLayer.objects.forEach(enemyOnLayer => {
+                            let tilesetObject = level.tilesFromTileSet[enemyOnLayer.gid]
+                            let sprite = new Sprite(tilesetObject.image, tilesetObject.coords.x, tilesetObject.coords.y, tilesetObject.coords.width, tilesetObject.coords.height, -tilesetObject.coords.width / 2, -tilesetObject.coords.height / 2)
+                            let collider = new RectangleCollider(tilesetObject.coords.width, tilesetObject.coords.height, -tilesetObject.coords.width / 2, -tilesetObject.coords.height / 2)
+
+                            collider.setLayer(ENEMY)
+                            collider.isActive = false
+
+                            let transform = new Transform(480 + enemyOnLayer.y + tilesetObject.coords.width / 2 - minX, 0)
+                            let enemy = new Enemy(transform, sprite)
+                            enemy.isActive = false
+                            enemiesWave.addEnemy(enemy)
+                        })
+                        WaveManager.addWave(enemiesWave)
+                    })
                 }
 
                 camera.setLimits(level.data.width * level.data.tilewidth, level.data.height * level.data.tileheight)
@@ -82,7 +121,7 @@ export default {
         //
         //         let worldCoords = camera.tileToScreen(x, y)
         //
-        //         pCtx.drawImage(texture.image, texture.coords.x, texture.coords.y, texture.coords.width, texture.coords.height, worldCoords.x, worldCoords.y, texture.coords.width, texture.coords.height);
+        //         pCtx.drawImage(texture.image, texture.coords.x, texture.coords.y, texture.coords.width, texture.coords.height, worldCoords.x, worldCoords.y, texture.coords.width, texture.coords.height)
         //     }
         // }
     }

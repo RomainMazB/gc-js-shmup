@@ -1,5 +1,11 @@
 window.clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 Math.angleBetweenPoints = (pointA, pointB) => Math.atan2(pointA.y - pointB.y, pointA.x - pointB.x)
+Math.randomBetween = function (min, max) {
+    min = Math.ceil(min),
+    max = Math.floor(max)
+
+    return Math.floor(Math.random() * (max - min +1)) + min;
+}
 Number.prototype.isBetween = function(a, b, including = true) {
     let min = Math.min(a, b),
         max = Math.max(a, b);

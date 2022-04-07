@@ -10,12 +10,34 @@ body {
     height: 640px;
     position: relative;
     overflow: hidden;
+    background-color: darkslategray;
 }
 
-img#scrolling-background {
+div#scrolling-background {
     position: absolute;
     inset: 0;
-    background-color: darkslategray;
+}
+
+div#scrolling-background div#repeating-scroll {
+    background-image: url("assets/images/infinite-scroll.png");
+    width: 960px;
+    height: 1000px;
+    transform-origin: 0 0 0;
+    transform: matrix3d(0.166667, 0, 0, 0,
+    -0.8, 0.166667, 0, -0.001667,
+    0, 0, 1, 0,
+    400, 0, 0, 1);
+    animation: 5s linear infinite infinite-scroll;
+}
+
+@keyframes infinite-scroll {
+    from {
+        background-position-y: 0;
+    }
+
+    to {
+        background-position-y: 500px;
+    }
 }
 
 div#menu {
@@ -42,6 +64,7 @@ div#menu button:hover {
     background-position-y: calc(12 * -64px);
 }
 
-canvas {
+div#stage #game-layer {
     position: absolute;
+    transform: translate3d(0,0,0);
 }

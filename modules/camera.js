@@ -1,6 +1,7 @@
-import {Transform} from "../classes/Transform.js";
-import RectangleBoxCollider from "../classes/RectangleBoxCollider.js";
-import {CAMERA} from "../utils/constants.js";
+import Transform from "../classes/Components/Transform.js"
+import RectangleBoxCollider from "../classes/Components/RectangleBoxCollider.js"
+import {CAMERA} from "../utils/constants.js"
+import GameObject from "../classes/GameObject.js"
 
 const camera = {
     maxX: 0,
@@ -11,8 +12,9 @@ const camera = {
     tileHeight: 0
 }
 
-export const cameraTransform = new Transform(0, 0)
-export const cameraCollider = new RectangleBoxCollider(cameraTransform, 960, 640)
+const cameraTransform = new Transform(0, 0)
+const CameraGameObject = new GameObject(cameraTransform)
+const cameraCollider = CameraGameObject.addComponent(new RectangleBoxCollider(960, 640))
 cameraCollider.setLayer(CAMERA)
 cameraCollider.isStatic = true
 
@@ -33,8 +35,7 @@ export default {
         camera.width = pWidth
         camera.height = pHeight
         cameraCollider.width = pWidth
-        cameraCollider.height = pHeight - 64
-        cameraCollider._offsetY = 32
+        cameraCollider.height = pHeight - 32
 
         if (camera.maxX === 0 && camera.maxY === 0) {
             camera.maxX = pWidth

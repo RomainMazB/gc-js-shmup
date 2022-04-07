@@ -1,4 +1,12 @@
-export default { "compressionlevel":-1,
+{ "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"js",
+         "target":"level1.js"
+        }
+    },
  "height":9,
  "infinite":false,
  "layers":[
@@ -111,7 +119,7 @@ export default { "compressionlevel":-1,
                         {
                          "name":"delay",
                          "type":"int",
-                         "value":3
+                         "value":10
                         }, 
                         {
                          "name":"x",
@@ -217,7 +225,7 @@ export default { "compressionlevel":-1,
                         {
                          "name":"delay",
                          "type":"int",
-                         "value":3
+                         "value":5
                         }, 
                         {
                          "name":"x",
@@ -323,7 +331,7 @@ export default { "compressionlevel":-1,
                         {
                          "name":"delay",
                          "type":"int",
-                         "value":3
+                         "value":10
                         }, 
                         {
                          "name":"x",
@@ -346,7 +354,7 @@ export default { "compressionlevel":-1,
  "nextobjectid":48,
  "orientation":"orthogonal",
  "renderorder":"left-down",
- "tiledversion":"1.8.2",
+ "tiledversion":"1.4.3",
  "tileheight":64,
  "tilesets":[
         {
@@ -355,6 +363,6 @@ export default { "compressionlevel":-1,
         }],
  "tilewidth":64,
  "type":"map",
- "version":"1.8",
+ "version":1.4,
  "width":50
 }
