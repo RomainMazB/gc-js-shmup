@@ -1,4 +1,4 @@
-export default class idGenerator {
+class UniqIdGenerator {
     #id = 0
 
     get newId() { return this.#id++ }

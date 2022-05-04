@@ -1,84 +1,150 @@
-import PubSub from "./utils/PubSub.js"
-import EnemiesWave from "./EnemiesWave.js"
-
-/** @var {EnemiesWave[]} */
-let remainingWaves = []
-let timer = 0
-let timerIsRunning = false
-let isRunning = false
-/** @var {EnemiesWave|null} */
-let currentWave = null
-let currentWaveDefeatedSubscription
-let currentNWave = 0
-let textTimer = 0
-
-function spawnNextWave() {
-    // Stop the timer
+class WaveManager {
+    events = new PubSub()
+    remainingWaves = []
+    timer = 0
     timerIsRunning = false
+    isRunning = false
+    currentWave
+    currentWaveDefeatedSubscription
+    currentNWave = 0
+    textTimer = 0
+    #bossWave
+    #bossIsDefeated = false
 
-    // Unsubscribe from the previous wave events
-    if (currentWaveDefeatedSubscription)
-        currentWaveDefeatedSubscription.unsubscribe()
+    constructor(pGameObjectManager, pCollisionsManager, pLevelData, pAssetsAtlas) {
+        // Create all the level's wave
+        pLevelData.waves.forEach(waveData => {
+            let wave = new EnemiesWave(pGameObjectManager, waveData.delay, waveData.stoppingY)
 
-    // Inject the next wave and subscribe to the allEnemiesDefeated event to restart the timer
-    currentWave = remainingWaves.shift()
-    currentWaveDefeatedSubscription = currentWave.events.subscribe('allEnemiesDefeated', _ => timerIsRunning = true)
-    timer = currentWave.delay
+            // For each enemies, read the data and create it
+            waveData.enemies.forEach(enemyData => {
+                let className = (new Function(`return ${enemyData.class}`))()
 
-    // Start the wave
-    currentWave.start()
+                let transform = new Transform(enemyData.x, enemyData.y + 150)
+                let enemy = new className(pGameObjectManager, pCollisionsManager, transform, pAssetsAtlas)
+                enemy.isActive = false
+                enemy.getComponent(RigidBody).velocity = Vec2.bottom().scale(waveData.speed)
 
-    // Make the next wave text appear
-    currentNWave++
-    textTimer = 3
-}
+                if (enemyData.weaponClass !== undefined) {
+                    let fireRate = enemyData.fireRate !== undefined ? enemyData.fireRate : 1
+                    let projectileClass = enemyData.projectileClass !== undefined ? (new Function(`return ${enemyData.projectileClass}`))() : Projectile
+                    let className = (new Function(`return ${enemyData.weaponClass}`))()
 
-export const WaveManagerEvents = new PubSub();
+                    enemy.getComponent(Fighter).setWeapon(new className(pGameObjectManager, pCollisionsManager, pAssetsAtlas, projectileClass, ENEMY_PROJECTILES, enemy, fireRate))
+                    enemy.getComponent(Fighter).weapon.isFiring = true
+                }
 
-export default {
+                wave.addEnemy(enemy)
+            })
+
+            this.addWave(wave)
+        })
+
+        // Create the boss wave
+        this.#bossWave = new EnemiesWave(pGameObjectManager, 5, 300)
+
+        let className = (new Function(`return ${pLevelData.boss.class}`))()
+
+        let transform = new Transform(960/2, 150)
+        let enemy = new className(pGameObjectManager, pCollisionsManager, transform, pAssetsAtlas)
+        enemy.isActive = false
+        enemy.getComponent(RigidBody).velocity = Vec2.bottom().scale(300)
+        enemy.getComponent(Fighter).life = enemy.getComponent(Fighter).maxLife = pLevelData.boss.life
+        enemy.getComponent(Fighter).damage = pLevelData.boss.damage
+
+        this.#bossWave.addEnemy(enemy)
+    }
+
     addWave(pWave) {
-        remainingWaves.push(pWave)
-    },
+        this.remainingWaves.push(pWave)
+    }
 
     run() {
-        isRunning = true
-
-        if (currentWave === null) {
-            if (remainingWaves.length === 0)
-                WaveManagerEvents.publish('allWavesDefeated')
-            else
-                spawnNextWave()
-        }
-    },
-
-    stop () {
-        isRunning = false
-    },
+        this.isRunning = true
+        this.spawnNextWave()
+    }
 
     update(pDt) {
-        if (!isRunning) return
-        currentWave.update(pDt)
+        if (!this.isRunning) return
 
-        if (timerIsRunning) {
-            timer -= pDt
-            if (timer <= 0) spawnNextWave()
+        if (this.timerIsRunning) {
+            this.timer -= pDt
+            if (this.timer <= 0) this.spawnNextWave()
         }
 
-        if (textTimer > 0) textTimer -= pDt
-    },
+        if (this.textTimer > 0) this.textTimer -= pDt
+    }
 
     fixedUpdate(pFixedDt) {
-        if (currentWave === null) return
-        currentWave.fixedUpdate(pFixedDt)
-    },
+        if (this.currentWave === undefined)
+            return
+
+        this.currentWave.fixedUpdate(pFixedDt)
+    }
 
     draw(pCtx) {
-        currentWave.draw(pCtx)
-        if (textTimer > 0) {
-            pCtx.font = 'sans-serif 50px'
+        if (this.currentWave === null)
+            return
+
+        if (this.textTimer > 0) {
+            pCtx.font = '50pt sans-serif'
             pCtx.fontWeight = '900'
             pCtx.textAlign = 'center'
-            pCtx.fillText(`Starting wave ${currentNWave}`, 480, 300)
+            pCtx.fillText(`Starting wave ${this.currentNWave}`, 480, 300)
         }
+    }
+
+    spawnNextWave() {
+        // Stop the timer
+        this.timerIsRunning = false
+
+        // Emit the waveEnd event
+        this.events.publish('waveEnd')
+
+        // Inject the next wave and subscribe to the allEnemiesDefeated event to restart the timer
+        this.currentWave = this.remainingWaves.shift()
+        this.currentWaveDefeatedSubscription = this.currentWave.events.subscribe('allEnemiesDefeated', _ => this.#checkVictory())
+        this.timer = this.currentWave.delay
+
+        // Start the wave
+        this.currentWave.start()
+        this.events.publish('newWave', this.currentWave)
+
+        // Make the next wave text appear
+        this.currentNWave++
+        this.textTimer = 3
+    }
+
+    /**
+     * Check if the level is finished or if a new wave or boss should spawn
+     */
+    #checkVictory() {
+        if (this.remainingWaves.length === 0)
+            this.#bossIsDefeated
+                ? this.events.publish('levelFinished')
+                : this.#spawnBoss()
+        else
+            this.timerIsRunning = true
+    }
+
+    #spawnBoss() {
+        // Stop the timer
+        this.timerIsRunning = false
+
+        // Unsubscribe from the previous wave events
+        if (this.currentWaveDefeatedSubscription)
+            this.currentWaveDefeatedSubscription.unsubscribe()
+
+        // Inject the boss wave and subscribe to the allEnemiesDefeated event to finish the level
+        this.currentWave = this.#bossWave
+        this.#bossWave = null
+        this.currentWaveDefeatedSubscription = this.currentWave.events.subscribe('allEnemiesDefeated', _ => this.events.publish('levelFinished'))
+        this.timer = 5
+
+        // Fire the bossSpawned event with boss' data
+        this.events.publish('bossSpawned', this.currentWave.firstEnemy)
+
+        // Start the wave
+        this.currentWave.start()
     }
 }

@@ -1,51 +1,41 @@
-import './utils/input-system.js'
-import './utils/math-utils.js'
-import level from './modules/level.js'
-import hero from './modules/hero.js'
-import camera from './modules/camera.js'
-import controls from './modules/controls.js'
-import projectiles from "./modules/projectiles.js"
-import updater from './utils/updater.js'
-import physics from "./utils/physics.js"
-import ui from "./modules/ui.js"
-import waveManager from "./classes/WaveManager.js"
-import WaveManager from "./classes/WaveManager.js";
-window.debug = true
+window.debug = false
 
-export default {
-    async load (pCanvas, pCtx) {
-        camera.setCameraSize(pCanvas.width, pCanvas.height)
-        await level.load(1)
-        await hero.load()
-        ui.load(pCtx)
-        controls.load()
-        projectiles.load()
-        WaveManager.run()
-    },
+class SceneChanger {
+    #startingScene
+    #currentScene
+    #gameCtx
 
-    update (pDt) {
-        level.update(pDt)
-        hero.update(pDt)
-        controls.update(pDt)
-        updater.update(pDt)
-        waveManager.update(pDt)
-        ui.update(pDt)
-    },
+    constructor(pStartingScene) {
+        this.#startingScene = pStartingScene
+    }
 
-    draw (pCtx) {
-        camera.translate(pCtx)
-        level.draw(pCtx)
-        hero.draw(pCtx)
-        waveManager.draw(pCtx)
-        physics.draw(pCtx)
-        projectiles.draw(pCtx)
-        camera.reset(pCtx)
-        ui.draw(pCtx)
-    },
+    load(pCtx) {
+        this.#gameCtx = pCtx
+        this.selectScene(this.#startingScene)
+    }
 
-    fixedUpdate(pFixedDt) {
-        updater.fixedUpdate(pFixedDt)
-        physics.fixedUpdate(pFixedDt)
-        waveManager.fixedUpdate(pFixedDt)
+    selectScene(newScene) {
+        if (this.#currentScene !== undefined) {
+            this.#currentScene.destroy()
+        }
+
+        newScene.setSceneChanger(this)
+        newScene.load(this.#gameCtx)
+
+        this.#currentScene = newScene
+    }
+
+    update(pDt) {
+        this.#currentScene.update(pDt)
+    }
+
+    fixedUpdate(pDt) {
+        this.#currentScene.fixedUpdate(pDt)
+    }
+
+    draw(pCtx) {
+        this.#currentScene.draw(pCtx)
     }
 }
+
+const game = new SceneChanger(new Loading(new Splash))

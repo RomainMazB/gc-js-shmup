@@ -1,7 +1,7 @@
 /**
  * These 3 functions reproduce the keypressed mechanism
  */
-// Stores the keypressed keyCodes
+// Stores the pressed keys keyCodes
 let downKeys = []
 
 // On keydown, add the keyCode to the downKeys array
@@ -23,22 +23,43 @@ document.addEventListener("keyup", e => {
 window.addEventListener("blur", e => downKeys = [])
 
 // Return whether the keyCode is down or not
-export const isKeyDown = searchedCode => downKeys.findIndex(keyCode => keyCode === searchedCode) !== -1
+const isKeyDown = searchedCode => downKeys.findIndex(keyCode => keyCode === searchedCode) !== -1
 
-// Bind an event on the keydown event
-export const keyDown = (keyCode, callback) =>
-    document.addEventListener("keydown", e => {
+// Bind an event on the keydown event and return the event un-subscription
+const keyDown = (keyCode, callback) => {
+    let cb = e => {
         if (e.code === keyCode) callback(e)
-    })
+    }
 
-// Bind an event on the keyup event
-export const keyUp = (keyCode, callback) =>
-    document.addEventListener("keyup", e => {
+    document.addEventListener("keydown", cb)
+
+    return {
+        removeEvent: _ => document.removeEventListener("keydown", cb)
+    }
+}
+
+// Bind an event on the keyup event and return the event un-subscription
+const keyUp = (keyCode, callback) =>{
+    let cb = e => {
         if (e.code === keyCode) callback(e)
-    })
+    }
 
-// Bind events on the keyup and keydown events
-export const keyUpDown = (keyCode, callbackDown, callbackUp) => {
-    keyDown(keyCode, callbackDown)
-    keyUp(keyCode, callbackUp)
+    document.addEventListener("keyup", cb)
+
+    return {
+        removeEvent: _ => document.removeEventListener("keyup", cb)
+    }
+}
+
+// Bind events on the keyup and keydown events and return the event un-subscription
+const keyUpDown = (keyCode, callbackDown, callbackUp) => {
+    let up = keyDown(keyCode, callbackDown)
+    let down = keyUp(keyCode, callbackUp)
+
+    return {
+        removeEvent: _ => {
+            up.removeEvent()
+            down.removeEvent()
+        }
+    }
 }

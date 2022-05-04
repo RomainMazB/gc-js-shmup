@@ -4,17 +4,85 @@
     <meta charset="UTF-8">
     <title>MyGame</title>
     <link rel="stylesheet" href="./style.css">
-    <script src="init.js" type="module"></script>
+
+    <!-- Constants -->
+    <script src="utils/constants.js"></script>
+
+    <!-- Utils -->
+    <script src="utils/math-utils.js"></script>
+    <script src="utils/input-system.js"></script>
+    <script src="classes/utils/PubSub.js"></script>
+    <script src="classes/utils/ObjectPool.js"></script>
+    <script src="classes/utils/ObjectPoolMember.js"></script>
+    <script src="classes/utils/Vec2.js"></script>
+    <script src="classes/utils/UniqIdGenerator.js"></script>
+
+    <!-- Game Engine -->
+    <script src="classes/Engine/GameObject.js"></script>
+    <script src="classes/Engine/GameObjectManager.js"></script>
+    <script src="classes/Engine/CollisionResolution.js"></script>
+    <script src="classes/Engine/CollisionsManager.js"></script>
+    <script src="classes/Engine/Components/Transform.js"></script>
+    <script src="classes/Engine/ComponentBase.js"></script>
+    <script src="classes/Engine/Components/Sprite.js"></script>
+    <script src="classes/Engine/Components/AnimatedSprite.js"></script>
+    <script src="classes/Engine/Components/Animator.js"></script>
+    <script src="classes/Engine/Components/RigidBody.js"></script>
+    <script src="classes/Engine/Components/Collider.js"></script>
+    <script src="classes/Engine/Components/RectangleCollider.js"></script>
+    <script src="classes/Engine/Components/CircleCollider.js"></script>
+    <script src="classes/Engine/Components/Fighter.js"></script>
+    <script src="classes/Engine/AssetAtlas.js"></script>
+    <script src="classes/Engine/AssetsLoader.js"></script>
+
+    <!-- Scenes -->
+    <script src="classes/Scenes/SceneBase.js"></script>
+    <script src="classes/Scenes/Loading.js"></script>
+    <script src="classes/Scenes/Splash.js"></script>
+    <script src="classes/Scenes/Game.js"></script>
+    <script src="classes/Scenes/Victory.js"></script>
+    <script src="classes/Scenes/Defeat.js"></script>
+
+    <!-- Game -->
+        <!-- Weapons -->
+    <script src="classes/Weapons/WeaponBase.js"></script>
+    <script src="classes/Weapons/SingleBullet.js"></script>
+    <script src="classes/Weapons/MultiParallelBullets.js"></script>
+    <script src="classes/Weapons/MultiVBullets.js"></script>
+        <!-- Enemies -->
+    <script src="classes/Enemies/EnemyBase.js"></script>
+    <script src="classes/Enemies/Orc.js"></script>
+    <script src="classes/Enemies/Archer.js"></script>
+    <script src="classes/Enemies/Miner.js"></script>
+    <script src="classes/Enemies/Leather.js"></script>
+
+    <script src="classes/Hero.js"></script>
+    <script src="classes/EnemiesWave.js"></script>
+    <script src="classes/WaveManager.js"></script>
+    <script src="classes/Foliage.js"></script>
+    <script src="classes/FoliageManager.js"></script>
+    <script src="classes/HeartLifeBar.js"></script>
+    <script src="classes/GameUI.js"></script>
+    <script src="classes/Projectile.js"></script>
+    <!-- Particles Emitter -->
+    <script src="classes/Particle.js"></script>
+    <script src="classes/ParticlesEmitter.js"></script>
+    <script src="classes/ServiceContainer.js"></script>
+
+    <!-- Game Loop -->
+    <script src="main.js"></script>
+    <script src="init.js" defer></script>
 </head>
+
 <body>
     <div id="stage">
+        <div id="clouds"></div>
+        <div id="grass-ground"></div>
+        <div id="foreground"></div>
         <div id="scrolling-background">
-            <div id="repeating-scroll"></div>
+            <div id="repeating-road"></div>
         </div>
-        <canvas id="game-layer" width="960" height="576"></canvas>
-        <div id="menu">
-            <button>coucou</button>
-        </div>
+        <canvas id="game-layer" width="960" height="636"></canvas>
     </div>
 </body>
 </html>

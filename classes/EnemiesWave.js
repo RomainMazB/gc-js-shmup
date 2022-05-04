@@ -1,72 +1,59 @@
-import PubSub from "./utils/PubSub.js"
-import Enemy from "./Enemy.js"
-import {Vec2} from "./utils/Vec2.js"
-import Collider from "./Components/Collider.js"
-import RigidBody from "./Components/RigidBody.js"
-import GameObjectManager from "./GameObjectManager.js"
-
-export default class EnemiesWave {
-    /** @var {Enemy[]} */
-    enemies = []
+class EnemiesWave {
+    /** @var {EnemyBase[]} */
+    #enemies = []
     events = new PubSub()
-    x
+    #stoppingY
     #delay
-    #firstEnemyOnLeft
-    #lastEnemyOnRight
-    #appearingSpeed
+    #crossedTheLimit = false
+    #started = false
+    get firstEnemy() { return this.#enemies[0] }
     get delay() { return this.#delay }
-    get width() { return this.#lastEnemyOnRight.x - this.#firstEnemyOnLeft.x + this.#lastEnemyOnRight.width }
+    get enemies() { return this.#enemies }
 
-    constructor(pDelay, pX, pAppearingSpeed = Vec2.bottom().scale(20)) {
+    constructor(pGameObjectManager, pDelay, pStoppingY) {
         this.#delay = pDelay
-        this.x = pX
-        this.#appearingSpeed = pAppearingSpeed instanceof Number ? new Vec2(pAppearingSpeed, 0) : pAppearingSpeed
+        this.#stoppingY = pStoppingY
     }
 
     addEnemy(enemy) {
-        enemy.getComponent(Collider).isActive = false
-        enemy.getComponent(RigidBody).isActive = false
-        if (this.enemies.length === 0) {
-            this.#firstEnemyOnLeft = enemy
-            this.#lastEnemyOnRight = enemy
-        } else {
-            if (enemy.x < this.#firstEnemyOnLeft.x) this.#firstEnemyOnLeft = enemy
-            if (enemy.x > this.#lastEnemyOnRight.x) this.#lastEnemyOnRight = enemy
-        }
+        enemy.isActive = false
 
-        enemy.events.subscribe('destroyed', id => {
-            let idx = this.enemies.findIndex(e => e.id === id)
-            this.enemies.splice(idx, 1)
-            this.#checkWaveEnd()
-        })
+        enemy.events.subscribe(DESTROYED_EVENT, enemy => this.#removeEnemy(enemy.id))
 
-        this.enemies.push(enemy)
-        GameObjectManager.add(enemy)
+        this.#enemies.push(enemy)
+    }
+
+    #removeEnemy(pId) {
+        let idx = this.#enemies.findIndex(e => e.id === pId)
+
+        if (idx !== -1)
+            this.#enemies.splice(idx, 1)
+
+        this.#checkWaveEnd()
     }
 
     #checkWaveEnd() {
-        if (this.enemies.length === 0) {
+        if (this.#enemies.length === 0)
             this.events.publish('allEnemiesDefeated')
+    }
+
+    fixedUpdate(pFixedDt) {
+        if (!this.#started) return
+
+        if (this.#crossedTheLimit || this.#enemies.length === 0) return
+
+        let currentAnimatorSprite = this.firstEnemy.getComponent(Animator).currentStateSprite
+
+        if (currentAnimatorSprite && this.firstEnemy.transform.y + currentAnimatorSprite._height > this.#stoppingY) {
+            this.#enemies.forEach(enemy => enemy.getComponent(RigidBody).velocity = Vec2.zero())
+            this.#crossedTheLimit = true
         }
     }
 
-    update() {}
-
-    fixedUpdate(pFixedDt) {
-        if (this.#lastEnemyOnRight.y + this.#lastEnemyOnRight.height > this.x)
-            this.enemies.forEach(enemy => enemy.getComponent(RigidBody).velocity = Vec2.zero())
-    }
-
     start() {
-        this.enemies.forEach(enemy => {
-            enemy.getComponent(RigidBody).velocity = this.#appearingSpeed
-            enemy.getComponent(RigidBody).isActive = true
-            enemy.getComponent(Collider).isActive = true
-            enemy.isActive = true
-        })
-    }
-
-    draw(pCtx) {
-        this.enemies.forEach(enemy => enemy.draw(pCtx))
+        // Order enemies to make the wave stop at the good position depending on the first enemy position
+        this.#enemies.sort((a, b) => a.y > b.y ? 1 : 0)
+        this.#enemies.forEach(enemy => enemy.isActive = true )
+        this.#started = true
     }
 }

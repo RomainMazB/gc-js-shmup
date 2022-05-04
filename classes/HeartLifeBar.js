@@ -1,12 +1,13 @@
-export default class HeartLifeBar {
+class HeartLifeBar {
     max
     current
     emptyHeartPattern
     halfHeartPattern
     filledHeartPattern
     #transform
+    #title
 
-    constructor(pCtx, pTransform, pMax, pFilled = true) {
+    constructor(pCtx, pTransform, pTitle, pMax, pFilled = true) {
         let emptyHeartImg = new Image()
         let HalfFilledHeartImg = new Image()
         let filledHeartImg = new Image()
@@ -20,6 +21,7 @@ export default class HeartLifeBar {
         this.max = pMax
         this.current = pFilled ? pMax : 0
         this.#transform = pTransform
+        this.#title = pTitle
     }
 
     draw(pCtx) {
@@ -29,6 +31,9 @@ export default class HeartLifeBar {
 
         pCtx.save()
         pCtx.translate(this.#transform.x, this.#transform.y)
+        pCtx.font = '20px sans-serif'
+        pCtx.fillText(this.#title, pCtx.measureText(this.#title).width / 2, this.#transform.y + 10)
+        pCtx.translate(0, 20)
         if (nbFilledHearts > 0) {
             let width = nbFilledHearts * 32
             pCtx.fillStyle = this.filledHeartPattern

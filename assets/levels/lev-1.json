@@ -1,0 +1,139 @@
+{
+  "title": "Space invaders in the forest",
+  "waves": [
+    {
+      "delay": 3,
+      "speed": 50,
+      "stoppingY": 300,
+      "enemies": [
+        {
+          "class": "Leather",
+          "x": 100,
+          "y": 0
+        },
+        {
+          "class": "Leather",
+          "x": 250,
+          "y":  0
+        },
+        {
+          "class": "Leather",
+          "x": 400,
+          "y":  0
+        },
+        {
+          "class": "Leather",
+          "x": 550,
+          "y":  0
+        },
+        {
+          "class": "Leather",
+          "x": 700,
+          "y":  0
+        }
+      ]
+    },{
+      "delay": 3,
+      "speed": 50,
+      "stoppingY": 300,
+      "enemies": [
+        {
+          "class": "Orc",
+          "x": 100,
+          "y": 0
+        },
+        {
+          "class": "Orc",
+          "x": 250,
+          "y":  0
+        },
+        {
+          "class": "Orc",
+          "x": 400,
+          "y":  0
+        },
+        {
+          "class": "Orc",
+          "x": 550,
+          "y":  0
+        },
+        {
+          "class": "Orc",
+          "x": 700,
+          "y":  0
+        }
+      ]
+    },
+    {
+      "delay": 3,
+      "speed": 50,
+      "stoppingY": 300,
+      "enemies": [
+        {
+          "class": "Leather",
+          "x": 100,
+          "y": 0
+        },
+        {
+          "class": "Leather",
+          "x": 250,
+          "y":  0
+        },
+        {
+          "class": "Leather",
+          "x": 400,
+          "y":  0
+        },
+        {
+          "class": "Leather",
+          "x": 550,
+          "y":  0
+        },
+        {
+          "class": "Leather",
+          "x": 700,
+          "y":  0
+        }
+      ]
+    },{
+      "delay": 3,
+      "speed": 50,
+      "stoppingY": 300,
+      "enemies": [
+        {
+          "class": "Orc",
+          "x": 100,
+          "y": 0
+        },
+        {
+          "class": "Orc",
+          "x": 250,
+          "y":  0
+        },
+        {
+          "class": "Orc",
+          "x": 400,
+          "y":  0
+        },
+        {
+          "class": "Orc",
+          "x": 550,
+          "y":  0
+        },
+        {
+          "class": "Orc",
+          "x": 700,
+          "y":  0
+        }
+      ]
+    }
+  ],
+  "boss": {
+    "class": "Leather",
+    "life": 20,
+    "damage": 3,
+    "weaponClass":  "MultiVBullets",
+    "nbBullets": 5,
+    "angleBetweenBullets": 10
+  }
+}

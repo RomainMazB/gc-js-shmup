@@ -15,19 +15,22 @@ body {
 
 div#scrolling-background {
     position: absolute;
-    inset: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 500px;
 }
 
-div#scrolling-background div#repeating-scroll {
+div#scrolling-background div#repeating-road {
     background-image: url("assets/images/infinite-scroll.png");
     width: 960px;
-    height: 1000px;
+    height: 500px;
     transform-origin: 0 0 0;
-    transform: matrix3d(0.166667, 0, 0, 0,
-    -0.8, 0.166667, 0, -0.001667,
+    transform: matrix3d(0.15625, 0, 0, 0,
+    -0.81, 0.15625, 0, -0.001687,
     0, 0, 1, 0,
-    400, 0, 0, 1);
-    animation: 5s linear infinite infinite-scroll;
+    405, 0, 0, 1);
+    animation: 20s linear infinite infinite-scroll;
 }
 
 @keyframes infinite-scroll {
@@ -37,6 +40,54 @@ div#scrolling-background div#repeating-scroll {
 
     to {
         background-position-y: 500px;
+    }
+}
+
+div#clouds {
+    position: absolute;
+    background-image: url("assets/images/backgrounds/clouds.png");
+    width: 960px;
+    height: 960px;
+    background-position-y: -75px;
+    animation: 20s alternate infinite clouds;
+}
+
+@keyframes clouds {
+    from {
+        background-position-x: 0;
+    }
+
+    to {
+        background-position-x: 500px;
+    }
+}
+
+div#foreground {
+    position: absolute;
+    top: 68px;
+    background-image: url("assets/images/backgrounds/foreground.png");
+    background-size: contain;
+    height: 150px;
+    width: 960px;
+}
+
+div#grass-ground {
+    position: absolute;
+    bottom: 0;
+    background-image: url("assets/images/backgrounds/grass-ground.png");
+    background-size: contain;
+    width: 960px;
+    height: 510px;
+    /*animation: 40s linear infinite grass-ground;*/
+}
+
+@keyframes grass-ground {
+    from {
+        background-position-y: 0;
+    }
+
+    to {
+        background-position-y: 490px;
     }
 }
 
